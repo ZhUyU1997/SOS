@@ -601,7 +601,7 @@ U8 Write_Mult_Block(U32 Addr, U32 count, U8* TxBuffer) {
 		return 0;
 	} else {					//*** remain counter became zero
 		rSDIDCON  =  0x0; 		//DataCon clear
-		
+
 		if (count > 1)			//CMD12 is needed after CMD25 to change SD states to tran
 			while (CMD12() != 1);	//发送结束指令
 		do {
@@ -642,8 +642,7 @@ U8 Erase_Block(U32 StartAddr, U32 EndAddr) {
 说明：无
 **********************************************/
 U8 SDI_init(void) {
-	U16 i;
-	U16 iTemp;
+	int i;
 	U8  MBR[512];
 
 	udelay(500000);	//当板子重新上电时需要延时
@@ -666,22 +665,31 @@ U8 SDI_init(void) {
 		switch (CMD8()) {
 			case 0://卡固件无效
 				SDCard.cCardType = INVALID_CARD;
+				SD_DEBUG("卡固件无效\n");
 				break;
 			case 1://非 SD2.0 卡
 				SDCard.cCardType = SD_V1X_CARD;
+				SD_DEBUG("非 SD2.0 卡n");
 				break;
 			case 2://SD2.0 卡
 				SDCard.cCardType = SDHC_V20_CARD;
+				SD_DEBUG("SD2.0 卡\n");
 				break;
 		}
 	}
 
 	SDCard.iCardRCA = 0;
-	for (i = 0; i < 100; i++) {
-		if (ACMD41(SDCard.iCardRCA))
+	for (int j = 0; j < 20; j++) {
+		for (i = 0; i < 100; i++) {
+			if (ACMD41(SDCard.iCardRCA))
+				break;
+			udelay(2000);
+		}
+		if (i < 100)
 			break;
-		udelay(2000);
+		CMD1();
 	}
+
 
 	if (i == 100) {
 		printf("Initialize fail\nNo Card assertion\n");
@@ -776,7 +784,7 @@ U8 SDI_init(void) {
 
 
 U8 Read_Block(U32 Addr, U32 count, U8* RxBuffer) {
-	assert((count)&&(RxBuffer));
+	assert((count) && (RxBuffer));
 	if (count == 0) {
 		return 0;
 	} else if (count < 4096) {
@@ -789,7 +797,7 @@ U8 Read_Block(U32 Addr, U32 count, U8* RxBuffer) {
 	}
 }
 U8 Write_Block(U32 Addr, U32 count, U8* TxBuffer) {
-	assert((count)&&(TxBuffer));
+	assert((count) && (TxBuffer));
 	if (count == 0) {
 		return 0;
 	} else if (count < 4096) {
