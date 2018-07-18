@@ -3,9 +3,9 @@
 #include "ff.h"
 #include "mp3dec.h"
 
-#define MP3_TITSIZE_MAX		40		//¸èÇúÃû×Ö×î´ó³¤¶È
-#define MP3_ARTSIZE_MAX		40		//¸èÇúÃû×Ö×î´ó³¤¶È
-#define MP3_FILE_BUF_SZ    2*1024	//MP3½âÂëÊ±,ÎÄ¼şbuf´óĞ¡
+#define MP3_TITSIZE_MAX		40		//æ­Œæ›²åå­—æœ€å¤§é•¿åº¦
+#define MP3_ARTSIZE_MAX		40		//æ­Œæ›²åå­—æœ€å¤§é•¿åº¦
+#define MP3_FILE_BUF_SZ    2*1024	//MP3è§£ç æ—¶,æ–‡ä»¶bufå¤§å°
 
 #define __PACKED __attribute__((packed))
 
@@ -16,64 +16,64 @@ typedef unsigned short u16;
 typedef unsigned int u32;
 typedef unsigned int  uint32_t;
 
-/*ID3V1 ±êÇ© */
+/*ID3V1 æ ‡ç­¾ */
 typedef struct {
-	uint8_t id[3];		   	//ID,TAGÈı¸ö×ÖÄ¸
-	uint8_t title[30];		//¸èÇúÃû×Ö
-	uint8_t artist[30];		//ÒÕÊõ¼ÒÃû×Ö
-	uint8_t year[4];		//Äê´ú
-	uint8_t comment[30];	//±¸×¢
-	uint8_t genre;			//Á÷ÅÉ
+	uint8_t id[3];		   	//ID,TAGä¸‰ä¸ªå­—æ¯
+	uint8_t title[30];		//æ­Œæ›²åå­—
+	uint8_t artist[30];		//è‰ºæœ¯å®¶åå­—
+	uint8_t year[4];		//å¹´ä»£
+	uint8_t comment[30];	//å¤‡æ³¨
+	uint8_t genre;			//æµæ´¾
 } ID3V1_Tag __PACKED;
 
-/*ID3V2 ±êÇ©Í·*/
+/*ID3V2 æ ‡ç­¾å¤´*/
 typedef struct {
 	uint8_t id[3];		   	//ID
-	uint8_t mversion;		//Ö÷°æ±¾ºÅ
-	uint8_t sversion;		//×Ó°æ±¾ºÅ
-	uint8_t flags;			//±êÇ©Í·±êÖ¾
-	uint8_t size[4];		//±êÇ©ĞÅÏ¢´óĞ¡(²»°üº¬±êÇ©Í·10×Ö½Ú).ËùÒÔ,±êÇ©´óĞ¡=size+10.
+	uint8_t mversion;		//ä¸»ç‰ˆæœ¬å·
+	uint8_t sversion;		//å­ç‰ˆæœ¬å·
+	uint8_t flags;			//æ ‡ç­¾å¤´æ ‡å¿—
+	uint8_t size[4];		//æ ‡ç­¾ä¿¡æ¯å¤§å°(ä¸åŒ…å«æ ‡ç­¾å¤´10å­—èŠ‚).æ‰€ä»¥,æ ‡ç­¾å¤§å°=size+10.
 } ID3V2_TagHead __PACKED;
 
-/*ID3V2.3 °æ±¾Ö¡Í·*/
+/*ID3V2.3 ç‰ˆæœ¬å¸§å¤´*/
 typedef struct {
-	uint8_t id[4];		   	//Ö¡ID
-	uint8_t size[4];		//Ö¡´óĞ¡
-	uint16_t flags;			//Ö¡±êÖ¾
+	uint8_t id[4];		   	//å¸§ID
+	uint8_t size[4];		//å¸§å¤§å°
+	uint16_t flags;			//å¸§æ ‡å¿—
 } ID3V23_FrameHead __PACKED;
 
-/*MP3 XingÖ¡ĞÅÏ¢(Ã»ÓĞÈ«²¿ÁĞ³öÀ´,½öÁĞ³öÓĞÓÃµÄ²¿·Ö)*/
+/*MP3 Xingå¸§ä¿¡æ¯(æ²¡æœ‰å…¨éƒ¨åˆ—å‡ºæ¥,ä»…åˆ—å‡ºæœ‰ç”¨çš„éƒ¨åˆ†)*/
 typedef struct {
-	uint8_t id[4];		   	//Ö¡ID,ÎªXing/Info
-	uint8_t flags[4];		//´æ·Å±êÖ¾
-	uint8_t frames[4];		//×ÜÖ¡Êı
-	uint8_t fsize[4];		//ÎÄ¼ş×Ü´óĞ¡(²»°üº¬ID3)
+	uint8_t id[4];		   	//å¸§ID,ä¸ºXing/Info
+	uint8_t flags[4];		//å­˜æ”¾æ ‡å¿—
+	uint8_t frames[4];		//æ€»å¸§æ•°
+	uint8_t fsize[4];		//æ–‡ä»¶æ€»å¤§å°(ä¸åŒ…å«ID3)
 } MP3_FrameXing __PACKED;
 
 
-/*MP3 VBRIÖ¡ĞÅÏ¢(Ã»ÓĞÈ«²¿ÁĞ³öÀ´,½öÁĞ³öÓĞÓÃµÄ²¿·Ö)*/
+/*MP3 VBRIå¸§ä¿¡æ¯(æ²¡æœ‰å…¨éƒ¨åˆ—å‡ºæ¥,ä»…åˆ—å‡ºæœ‰ç”¨çš„éƒ¨åˆ†)*/
 typedef struct {
-	uint8_t id[4];		   	//Ö¡ID,ÎªXing/Info
-	uint8_t version[2];		//°æ±¾ºÅ
-	uint8_t delay[2];		//ÑÓ³Ù
-	uint8_t quality[2];		//ÒôÆµÖÊÁ¿,0~100,Ô½´óÖÊÁ¿Ô½ºÃ
-	uint8_t fsize[4];		//ÎÄ¼ş×Ü´óĞ¡
-	uint8_t frames[4];		//ÎÄ¼ş×ÜÖ¡Êı
+	uint8_t id[4];		   	//å¸§ID,ä¸ºXing/Info
+	uint8_t version[2];		//ç‰ˆæœ¬å·
+	uint8_t delay[2];		//å»¶è¿Ÿ
+	uint8_t quality[2];		//éŸ³é¢‘è´¨é‡,0~100,è¶Šå¤§è´¨é‡è¶Šå¥½
+	uint8_t fsize[4];		//æ–‡ä»¶æ€»å¤§å°
+	uint8_t frames[4];		//æ–‡ä»¶æ€»å¸§æ•°
 } MP3_FrameVBRI __PACKED;
 
 
-/*MP3¿ØÖÆ½á¹¹Ìå*/
+/*MP3æ§åˆ¶ç»“æ„ä½“*/
 typedef struct MP3CTRL {
-	uint8_t title[MP3_TITSIZE_MAX];		//¸èÇúÃû×Ö
-	uint8_t artist[MP3_ARTSIZE_MAX];	//ÒÕÊõ¼ÒÃû×Ö
-	uint32_t totsec ;					//ÕûÊ×¸èÊ±³¤,µ¥Î»:Ãë
-	uint32_t cursec ;					//µ±Ç°²¥·ÅÊ±³¤
+	uint8_t title[MP3_TITSIZE_MAX];		//æ­Œæ›²åå­—
+	uint8_t artist[MP3_ARTSIZE_MAX];	//è‰ºæœ¯å®¶åå­—
+	uint32_t totsec ;					//æ•´é¦–æ­Œæ—¶é•¿,å•ä½:ç§’
+	uint32_t cursec ;					//å½“å‰æ’­æ”¾æ—¶é•¿
 
-	uint32_t bitrate;	   				//±ÈÌØÂÊ
-	uint32_t samplerate;				//²ÉÑùÂÊ
-	uint16_t outsamples;				//PCMÊä³öÊı¾İÁ¿´óĞ¡(ÒÔ16Î»Îªµ¥Î»),µ¥ÉùµÀMP3,ÔòµÈÓÚÊµ¼ÊÊä³ö*2(·½±ãDACÊä³ö)
+	uint32_t bitrate;	   				//æ¯”ç‰¹ç‡
+	uint32_t samplerate;				//é‡‡æ ·ç‡
+	uint16_t outsamples;				//PCMè¾“å‡ºæ•°æ®é‡å¤§å°(ä»¥16ä½ä¸ºå•ä½),å•å£°é“MP3,åˆ™ç­‰äºå®é™…è¾“å‡º*2(æ–¹ä¾¿DACè¾“å‡º)
 
-	uint32_t datastart;					//Êı¾İÖ¡¿ªÊ¼µÄÎ»ÖÃ(ÔÚÎÄ¼şÀïÃæµÄÆ«ÒÆ)
+	uint32_t datastart;					//æ•°æ®å¸§å¼€å§‹çš„ä½ç½®(åœ¨æ–‡ä»¶é‡Œé¢çš„åç§»)
 } MP3CTRL __PACKED;
 
 

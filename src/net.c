@@ -39,10 +39,10 @@ void EINT_DM9000_Init(void) {
 	GPFCON &=  ~(3 << 14);
 	GPFCON |= (2 << 14);
 
-	//TODO:¿ÉÄÜ·Ç±ØÒª
-	//GPF0-7½ûÖ¹ÉÏÀ­µç×è
+	//TODO:å¯èƒ½éžå¿…è¦
+	//GPF0-7ç¦æ­¢ä¸Šæ‹‰ç”µé˜»
 	GPFUP  = 0xff;
-	//EINT7¸ßµçÆ½´¥·¢
+	//EINT7é«˜ç”µå¹³è§¦å‘
 	EXTINT0 &= ~(7 << 28);
 	EXTINT0 |= (1 << 28);
 
@@ -69,11 +69,11 @@ void LWIP_Module_Init(void) {
 }
 
 void net_init() {
-	printf("³õÊ¼»¯lwip...\n");
+	printf("åˆå§‹åŒ–lwip...\n");
 	LWIP_Module_Init();
 	EINT_DM9000_Init();
 
-	printf("³õÊ¼»¯http server...\n");
+	printf("åˆå§‹åŒ–http server...\n");
 	httpserver_init();
 }
 
@@ -85,7 +85,7 @@ void Task0(void *pdata) {
 	DM_RXPKT *tmp;
 
 	pdata = pdata;
-	printf("ÈÎÎñ0Æô¶¯...\n");
+	printf("ä»»åŠ¡0å¯åŠ¨...\n");
 	while (1) {
 		q_msg = OSQPend(rxpkt_q, 0, &err);
 		//tmp =(DM_RXPKT *)q_msg;

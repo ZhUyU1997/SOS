@@ -23,19 +23,19 @@
 */
 
 
-typedef unsigned char  BOOLEAN;                 /* ²¼¶û±äÁ¿                                 */
-typedef unsigned char  INT8U;                   /* ÎŞ·ûºÅ8Î»ÕûĞÍ±äÁ¿                        */
-typedef signed   char  INT8S;                   /* ÓĞ·ûºÅ8Î»ÕûĞÍ±äÁ¿                        */
-typedef unsigned short INT16U;                  /* ÎŞ·ûºÅ16Î»ÕûĞÍ±äÁ¿                       */
-typedef signed   short INT16S;                  /* ÓĞ·ûºÅ16Î»ÕûĞÍ±äÁ¿                       */
-typedef unsigned int   INT32U;                  /* ÎŞ·ûºÅ32Î»ÕûĞÍ±äÁ¿                       */
-typedef signed   int   INT32S;                  /* ÓĞ·ûºÅ32Î»ÕûĞÍ±äÁ¿                       */
-typedef float          FP32;                    /* µ¥¾«¶È¸¡µãÊı£¨32Î»³¤¶È£©                 */
-typedef double         FP64;                    /* Ë«¾«¶È¸¡µãÊı£¨64Î»³¤¶È£©                 */
+typedef unsigned char  BOOLEAN;                 /* å¸ƒå°”å˜é‡                                 */
+typedef unsigned char  INT8U;                   /* æ— ç¬¦å·8ä½æ•´å‹å˜é‡                        */
+typedef signed   char  INT8S;                   /* æœ‰ç¬¦å·8ä½æ•´å‹å˜é‡                        */
+typedef unsigned short INT16U;                  /* æ— ç¬¦å·16ä½æ•´å‹å˜é‡                       */
+typedef signed   short INT16S;                  /* æœ‰ç¬¦å·16ä½æ•´å‹å˜é‡                       */
+typedef unsigned int   INT32U;                  /* æ— ç¬¦å·32ä½æ•´å‹å˜é‡                       */
+typedef signed   int   INT32S;                  /* æœ‰ç¬¦å·32ä½æ•´å‹å˜é‡                       */
+typedef float          FP32;                    /* å•ç²¾åº¦æµ®ç‚¹æ•°ï¼ˆ32ä½é•¿åº¦ï¼‰                 */
+typedef double         FP64;                    /* åŒç²¾åº¦æµ®ç‚¹æ•°ï¼ˆ64ä½é•¿åº¦ï¼‰                 */
 
-typedef INT32U         OS_STK;                  /* ¶ÑÕ»ÊÇ32Î»¿í¶È                           */
+typedef INT32U         OS_STK;                  /* å †æ ˆæ˜¯32ä½å®½åº¦                           */
 
-/* ÒÔÏÂÊÇ¼æÈİUC/OS V1.XXµÄÊı¾İÀàĞÍ£¬ÔÚuC/OS-IIÃ»ÓĞÊ¹ÓÃ  */
+/* ä»¥ä¸‹æ˜¯å…¼å®¹UC/OS V1.XXçš„æ•°æ®ç±»å‹ï¼Œåœ¨uC/OS-IIæ²¡æœ‰ä½¿ç”¨  */
 /*
 #define BYTE           INT8S
 #define UBYTE          INT8U

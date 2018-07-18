@@ -4,7 +4,7 @@
 #include "cpu.h"
 #include "ucos_ii.h"
 
-/* NULL ╢и╥х */
+/* NULL хоЪф╣Й */
 #ifndef NULL
 #define NULL 0
 #endif

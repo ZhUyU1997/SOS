@@ -14,7 +14,7 @@
 * LICENSING TERMS:
 * ---------------
 *   uC/OS-II is provided in source form for FREE evaluation, for educational use or for peaceful research.  
-* If you plan on using  uC/OS-II  in a commercial product you need to contact Micriµm to properly license 
+* If you plan on using  uC/OS-II  in a commercial product you need to contact MicriÁ•Ñ to properly license 
 * its use in your product. We provide ALL the source code for your convenience and to help you experience 
 * uC/OS-II.   The fact that the  source is provided does  NOT  mean that you can use it without  paying a 
 * licensing fee.
@@ -202,11 +202,11 @@ INT8U  OSTaskCreate(void (*task)(void *p_arg),void *p_arg,OS_STK *ptos,INT8U pri
       }
 #endif
 
-    OS_ENTER_CRITICAL();    //±£¥Ê»´æ÷÷–∂œ±Í÷æ,πÿ÷–∂œ
+    OS_ENTER_CRITICAL();    //‰øùÂ≠òÂÖ®Â±Ä‰∏≠Êñ≠Ê†áÂøó,ÂÖ≥‰∏≠Êñ≠
 
       if(OSIntNesting>0)      /* Make sure we don't create the task from within an ISR  */
 	    {                  
-         OS_EXIT_CRITICAL();	//ª÷∏¥»´æ÷÷–∂œ±Í÷æ
+         OS_EXIT_CRITICAL();	//ÊÅ¢Â§çÂÖ®Â±Ä‰∏≠Êñ≠Ê†áÂøó
          return (OS_ERR_TASK_CREATE_ISR);
         }
 
@@ -214,7 +214,7 @@ INT8U  OSTaskCreate(void (*task)(void *p_arg),void *p_arg,OS_STK *ptos,INT8U pri
 	     { 
            OSTCBPrioTbl[prio]=OS_TCB_RESERVED;/* Reserve the priority to prevent others from doing ...  */
                                               /* ... the same thing until task is created.              */
-           OS_EXIT_CRITICAL();	//ª÷∏¥»´æ÷÷–∂œ±Í÷æ
+           OS_EXIT_CRITICAL();	//ÊÅ¢Â§çÂÖ®Â±Ä‰∏≠Êñ≠Ê†áÂøó
            psp = OSTaskStkInit(task,p_arg,ptos,0);              /* Initialize the task's stack         */
            err = OS_TCBInit(prio,psp,(OS_STK *)0,0,0,(void *)0,0);
            if(err == OS_ERR_NONE) 
@@ -226,14 +226,14 @@ INT8U  OSTaskCreate(void (*task)(void *p_arg),void *p_arg,OS_STK *ptos,INT8U pri
              } 
 		   else
 		     {
-               OS_ENTER_CRITICAL();  //±£¥Ê»´æ÷÷–∂œ±Í÷æ,πÿ÷–∂œ
+               OS_ENTER_CRITICAL();  //‰øùÂ≠òÂÖ®Â±Ä‰∏≠Êñ≠Ê†áÂøó,ÂÖ≥‰∏≠Êñ≠
                OSTCBPrioTbl[prio] = (OS_TCB *)0;/* Make this priority available to others                 */
-               OS_EXIT_CRITICAL();	  //ª÷∏¥»´æ÷÷–∂œ±Í÷æ
+               OS_EXIT_CRITICAL();	  //ÊÅ¢Â§çÂÖ®Â±Ä‰∏≠Êñ≠Ê†áÂøó
              }
            return (err);
           }
 
-    OS_EXIT_CRITICAL();	  //ª÷∏¥»´æ÷÷–∂œ±Í÷æ
+    OS_EXIT_CRITICAL();	  //ÊÅ¢Â§çÂÖ®Â±Ä‰∏≠Êñ≠Ê†áÂøó
     return (OS_ERR_PRIO_EXIST);
 }
 #endif

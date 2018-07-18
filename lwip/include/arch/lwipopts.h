@@ -1,14 +1,14 @@
 #ifndef __LWIPOPTS_H__
 #define __LWIPOPTS_H__
 
-/* ÁÙ½çÇøµÄ±£»¤ */
+/* ä¸´ç•ŒåŒºçš„ä¿æŠ¤ */
 #define SYS_LIGHTWEIGHT_PROT         1
 
-#define NO_SYS                       0/* ÓĞÏµÍ³ */ 
+#define NO_SYS                       0/* æœ‰ç³»ç»Ÿ */ 
 #define LWIP_SOCKET                  1
 #define LWIP_NETCONN                 1
-#define MEM_ALIGNMENT                4/* 4×Ö½Ú¶ÔÆë */	
-#define MEM_SIZE                     1024*1024*1/* 1MµÄÄÚ´æ */  
+#define MEM_ALIGNMENT                4/* 4å­—èŠ‚å¯¹é½ */	
+#define MEM_SIZE                     1024*1024*1/* 1Mçš„å†…å­˜ */  
 #define ETH_PAD_SIZE				 0 /* pad size */
 
 //#define LWIP_DEBUG 

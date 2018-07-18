@@ -2,17 +2,17 @@
 #define __ARCH_CC_H__
 
 
-/* °üº¬Ïà¹ØÍ·ÎÄ¼ş */
+/* åŒ…å«ç›¸å…³å¤´æ–‡ä»¶ */
 #include <string.h>
 #include <assert.h>
 
 #define BYTE_ORDER LITTLE_ENDIAN
 #define	LWIP_PROVIDE_ERRNO
-/* Ìá¹©±ê×¼´íÎó´úºÅ */
+/* æä¾›æ ‡å‡†é”™è¯¯ä»£å· */
 #define LWIP_PROVIDE_ERRNO
 
 
-/* ¶¨ÒåÓë±àÒëÆ÷ÎŞ¹ØµÄÊı¾İÀàĞÍ */
+/* å®šä¹‰ä¸ç¼–è¯‘å™¨æ— å…³çš„æ•°æ®ç±»å‹ */
 typedef unsigned   char    u8_t;
 typedef signed     char    s8_t;
 typedef unsigned   short   u16_t;
@@ -21,18 +21,18 @@ typedef unsigned   int     u32_t;
 typedef signed     int     s32_t;
 
 
-/* ¶¨ÒåÖ¸ÕëÀàĞÍ */
+/* å®šä¹‰æŒ‡é’ˆç±»å‹ */
 typedef u32_t mem_ptr_t;
 
 
-/* ½á¹¹Ìå */
+/* ç»“æ„ä½“ */
 #define PACK_STRUCT_FIELD(x) x __attribute__((packed))
 #define PACK_STRUCT_STRUCT  __attribute__((packed))
 #define PACK_STRUCT_BEGIN
 #define PACK_STRUCT_END
 
 
-/* Æ½Ì¨µ÷ÊÔÊä³öºÍ¶ÏÑÔ */
+/* å¹³å°è°ƒè¯•è¾“å‡ºå’Œæ–­è¨€ */
 #define LWIP_DEBUG
 #define LWIP_PLATFORM_DIAG(x)	 printf x
 #define LWIP_PLATFORM_ASSERT(x)  assert(x)
@@ -44,7 +44,7 @@ typedef u32_t mem_ptr_t;
 #define S32_F "d"
 #define X32_F "x"
 
-/* ÁÙ½çÇøµÄ±£»¤( Ê¹ÓÃuCOS-IIµÄµÚÈıÖÖÁÙ½ç´¦Àí·½Ê½ ) */
+/* ä¸´ç•ŒåŒºçš„ä¿æŠ¤( ä½¿ç”¨uCOS-IIçš„ç¬¬ä¸‰ç§ä¸´ç•Œå¤„ç†æ–¹å¼ ) */
 #include "os_cpu.h"
 #define SYS_ARCH_DECL_PROTECT(x) u32_t cpu_sr
 #define SYS_ARCH_PROTECT(x)      OS_ENTER_CRITICAL()

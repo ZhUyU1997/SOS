@@ -37,20 +37,20 @@
 #include "ucos_ii.h"
 #include "lwip/sys.h"
 #include "arch/sys_arch.h"
-//ucosiiµÄÄÚ´æ¹ÜÀí½á¹¹£¬ÎÒÃÇ½«ËùÓÐÓÊÏä¿Õ¼äÍ¨¹ýÄÚ´æ¹ÜÀí½á¹¹À´¹ÜÀí
+//ucosiiçš„å†…å­˜ç®¡ç†ç»“æž„ï¼Œæˆ‘ä»¬å°†æ‰€æœ‰é‚®ç®±ç©ºé—´é€šè¿‡å†…å­˜ç®¡ç†ç»“æž„æ¥ç®¡ç†
 
 /*
 static OS_MEM *MboxMem;
 static char MboxMemoryArea[TOTAL_MBOX_NUM * sizeof(struct LWIP_MBOX_STRUCT)];
-const u32_t NullMessage;//½â¾ö¿ÕÖ¸ÕëÍ¶µÝµÄÎÊÌâ
+const u32_t NullMessage;//è§£å†³ç©ºæŒ‡é’ˆæŠ•é€’çš„é—®é¢˜
 */
 
-//¶¨ÒåÏµÍ³Ê¹ÓÃµÄ³¬Ê±Á´±íÊ×Ö¸Õë½á¹¹
+//å®šä¹‰ç³»ç»Ÿä½¿ç”¨çš„è¶…æ—¶é“¾è¡¨é¦–æŒ‡é’ˆç»“æž„
 //struct sys_timeouts global_timeouts;
-//ÓëÏµÍ³ÈÎÎñÐÂ½¨º¯ÊýÏà¹ØµÄ±äÁ¿¶¨Òå
+//ä¸Žç³»ç»Ÿä»»åŠ¡æ–°å»ºå‡½æ•°ç›¸å…³çš„å˜é‡å®šä¹‰
 
-#define LWIP_MAX_TASKS 4 	//ÔÊÐíÄÚºË×î¶à´´½¨µÄÈÎÎñ¸öÊý
-#define LWIP_STK_SIZE  512	//Ã¿¸öÈÎÎñµÄ¶ÑÕ»¿Õ¼ä
+#define LWIP_MAX_TASKS 4 	//å…è®¸å†…æ ¸æœ€å¤šåˆ›å»ºçš„ä»»åŠ¡ä¸ªæ•°
+#define LWIP_STK_SIZE  512	//æ¯ä¸ªä»»åŠ¡çš„å †æ ˆç©ºé—´
 OS_STK  LWIP_STK_AREA[LWIP_MAX_TASKS][LWIP_STK_SIZE];
 
 
@@ -101,7 +101,7 @@ u32_t sys_arch_sem_wait(sys_sem_t *sem, u32_t timeout)
   u32_t start, end;
   LWIP_ASSERT("sem != NULL", sem != NULL);
 
-  if (OSSemAccept(*sem))		  // Èç¹ûÒÑ¾­ÊÕµ½, Ôò·µ»Ø0 
+  if (OSSemAccept(*sem))		  // å¦‚æžœå·²ç»æ”¶åˆ°, åˆ™è¿”å›ž0 
   {
 	  //printf("debug:sem accept ok\n");
 	  return 0;
@@ -121,7 +121,7 @@ u32_t sys_arch_sem_wait(sys_sem_t *sem, u32_t timeout)
   end = sys_now();
   
   if (Err == OS_NO_ERR)
-		return (u32_t)(end - start);		//½«µÈ´ýÊ±¼äÉèÖÃÎªtimeout/2
+		return (u32_t)(end - start);		//å°†ç­‰å¾…æ—¶é—´è®¾ç½®ä¸ºtimeout/2
   else
 		return SYS_ARCH_TIMEOUT;
   
@@ -349,7 +349,7 @@ u32_t sys_arch_mbox_fetch(sys_mbox_t *q, void **msg, u32_t timeout)
 	//SYS_ARCH_UNPROTECT(lev);
 	sys_mutex_unlock(&(q->mutex));
 	//printf("mbox fetch ok, match [%u] with tmp [%u] \n", q->msg_num, tmp_num);
-	//return (u32_t)(end - start);		//½«µÈ´ýÊ±¼äÉèÖÃÎªtimeout/2;
+	//return (u32_t)(end - start);		//å°†ç­‰å¾…æ—¶é—´è®¾ç½®ä¸ºtimeout/2;
 	return start;
   }
   else
@@ -428,7 +428,7 @@ u32_t sys_arch_mbox_tryfetch(sys_mbox_t *q, void **msg)
   }
 }
 
-//º¯Êý¹¦ÄÜ£ºÐÂ½¨Ò»¸ö½ø³Ì£¬ÔÚÕû¸öÏµÍ³ÖÐÖ»»á±»µ÷ÓÃÒ»´Î
+//å‡½æ•°åŠŸèƒ½ï¼šæ–°å»ºä¸€ä¸ªè¿›ç¨‹ï¼Œåœ¨æ•´ä¸ªç³»ç»Ÿä¸­åªä¼šè¢«è°ƒç”¨ä¸€æ¬¡
 //sys_thread_t sys_thread_new(char *name, void (* thread)(void *arg), void *arg, int stacksize, int prio);
 //prio 1~10, is kept for network 
 //TCPIP_THREAD_PRIO    1   -> lwip thead prio

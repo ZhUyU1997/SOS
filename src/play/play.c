@@ -32,8 +32,8 @@ int MpegAudioDecoder(FIL *InputFp) {
 	int offset;						// Used to save the offset to the next frame
 	UINT br, frame_count;
 	int ret = 1;
-	//¼ì²éMP3ÎÄ¼ş¸ñÊ½
-	MP3CTRL mp3ctrl;	//mp3¿ØÖÆ½á¹¹Ìå
+	//æ£€æŸ¥MP3æ–‡ä»¶æ ¼å¼
+	MP3CTRL mp3ctrl;	//mp3æ§åˆ¶ç»“æ„ä½“
 
 	u8 rst = mp3_get_info(InputFp, readBuf, READBUF_SIZE, &mp3ctrl);
 	if (rst)
@@ -46,16 +46,16 @@ int MpegAudioDecoder(FIL *InputFp) {
 	printf("samplerate:%d\n", mp3ctrl.samplerate);
 	printf("totalsec:%d\n", mp3ctrl.totsec);
 
-	f_lseek(InputFp, mp3ctrl.datastart);	//Ìø¹ıÎÄ¼şÍ·ÖĞtagĞÅÏ¢
+	f_lseek(InputFp, mp3ctrl.datastart);	//è·³è¿‡æ–‡ä»¶å¤´ä¸­tagä¿¡æ¯
 
 
 	/* Initilizes the MP3 Library */
 	// hMP3Decoder: Content is the pointers to all buffers and information for the MP3 Library
 	HMP3Decoder hMP3Decoder = MP3InitDecoder();
 	if (hMP3Decoder == 0) {
-		// ÕâÒâÎ¶×Å´æ´¢Æ÷·ÖÅäÊ§°Ü¡£ÕâÍ¨³£ÔÚ¶Ñ´æ´¢¿Õ¼ä²»×ãÊ±·¢Éú¡£
-		// ÇëÊ¹ÓÃÆäËû¶Ñ´æ´¢¿Õ¼äÖØĞÂ±àÒë´úÂë¡£
-		printf("\033[31mMP3 Decoder ³õÊ¼»¯Ê§°Ü\033[0m\n");
+		// è¿™æ„å‘³ç€å­˜å‚¨å™¨åˆ†é…å¤±è´¥ã€‚è¿™é€šå¸¸åœ¨å †å­˜å‚¨ç©ºé—´ä¸è¶³æ—¶å‘ç”Ÿã€‚
+		// è¯·ä½¿ç”¨å…¶ä»–å †å­˜å‚¨ç©ºé—´é‡æ–°ç¼–è¯‘ä»£ç ã€‚
+		printf("\033[31mMP3 Decoder åˆå§‹åŒ–å¤±è´¥\033[0m\n");
 		return 1;
 	}
 
@@ -72,7 +72,7 @@ int MpegAudioDecoder(FIL *InputFp) {
 
 		FRESULT fres = f_read(InputFp, readBuf, READBUF_SIZE, &br);
 		if (fres != FR_OK) {
-			printf("ÎÄ¼ş¶ÁÈ¡Ê§°Ü\n");
+			printf("æ–‡ä»¶è¯»å–å¤±è´¥\n");
 			ret = 1;
 			goto exit;
 		}
@@ -163,7 +163,7 @@ int MpegAudioDecoder(FIL *InputFp) {
 	}
 
 exit:
-	//Èç¹ûÔÚDMA´«ÊäÖ®Ç°¹Ø±ÕIIS,DSTATÇåÁã»áÊ§°Ü
+	//å¦‚æœåœ¨DMAä¼ è¾“ä¹‹å‰å…³é—­IIS,DSTATæ¸…é›¶ä¼šå¤±è´¥
 	framebuf_exit();
 	close_sound();
 	MP3FreeDecoder(hMP3Decoder);

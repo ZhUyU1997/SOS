@@ -39,7 +39,7 @@ int InfoNES_Menu() {
 		is_first = 0;
 		return 0;
 	}
-	printf("“™ÕÀ≥ˆ¬?[Y/N]:");
+	printf("Ë¶ÅÈÄÄÂá∫Âêó?[Y/N]:");
 	switch (getc()) {
 		case 'Y':
 		case 'y':
@@ -69,7 +69,7 @@ int InfoNES_ReadRom(const char *pszFileName) {
 		f_close(&file);
 		return -1;
 	}
-	res = f_read(&file, buffer, file.fsize, &state); //  ∂¡Œƒº˛ ˝æ›£¨≥§∂»file.fsize£¨
+	res = f_read(&file, buffer, file.fsize, &state); //  ËØªÊñá‰ª∂Êï∞ÊçÆÔºåÈïøÂ∫¶file.fsizeÔºå
 	if (FR_OK != res) {
 		printf("\nFile Read Error!!!%d", res);
 		f_close(&file);
@@ -99,7 +99,7 @@ int InfoNES_ReadRom(const char *pszFileName) {
 	printf("NesHeader.byInfo1    =%8x\n", NesHeader.byInfo1);
 	printf("NesHeader.byInfo2    =%8x\n", NesHeader.byInfo2);
 	if ((NesHeader.byID[0] != 0x4e) || (NesHeader.byID[1] != 0x45) || (NesHeader.byID[2] != 0x53) || (NesHeader.byID[3] != 0x1a)) {
-		printf("\033[41;36m Œ¥∑¢œ÷ NES Œƒº˛±Í ∂ \033[0m");
+		printf("\033[41;36m Êú™ÂèëÁé∞ NES Êñá‰ª∂Ê†áËØÜ \033[0m");
 		return -1;
 	}
 	memset(SRAM, 0, SRAM_SIZE);
@@ -111,7 +111,7 @@ int InfoNES_ReadRom(const char *pszFileName) {
 
 	/* Allocate Memory for ROM Image */
 	size = NesHeader.byRomSize * 0x4000 ;
-	printf("–Ë“™ %dKB ROM\n", size / 1024);
+	printf("ÈúÄË¶Å %dKB ROM\n", size / 1024);
 	ROM = RomBuf;
 
 	/* Read ROM Image */
@@ -120,7 +120,7 @@ int InfoNES_ReadRom(const char *pszFileName) {
 	if (NesHeader.byVRomSize > 0) {
 		/* Allocate Memory for VROM Image */
 		size = NesHeader.byVRomSize * 0x2000 ;
-		printf("–Ë“™ %dKB VROM\n", size / 1024);
+		printf("ÈúÄË¶Å %dKB VROM\n", size / 1024);
 		VROM = VROM_Buf;
 		/* Read VROM Image */
 		for (j = 0; j < size; j++) VROM[j] = buf[i++];
@@ -182,23 +182,23 @@ void InfoNES_PadState(DWORD *pdwPad1, DWORD *pdwPad2, DWORD *pdwSystem) {
 		case 'f':
 			index = 3;
 			break;
-		case 'W'://…œ
+		case 'W'://‰∏ä
 		case 'w':
 			index = 4;
 			break;
-		case 'S'://œ¬
+		case 'S'://‰∏ã
 		case 's':
 			index = 5;
 			break;
-		case 'A'://◊Û
+		case 'A'://Â∑¶
 		case 'a':
 			index = 6;
 			break;
-		case 'D'://”“
+		case 'D'://Âè≥
 		case 'd':
 			index = 7;
 			break;
-		case 'Q'://”“
+		case 'Q'://Âè≥
 		case 'q':
 			index = 8;
 			break;

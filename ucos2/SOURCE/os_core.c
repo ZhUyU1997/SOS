@@ -14,7 +14,7 @@
 * LICENSING TERMS:
 * ---------------
 *   uC/OS-II is provided in source form for FREE evaluation, for educational use or for peaceful research.  
-* If you plan on using  uC/OS-II  in a commercial product you need to contact Micriµm to properly license 
+* If you plan on using  uC/OS-II  in a commercial product you need to contact MicriÁ•Ñ to properly license 
 * its use in your product. We provide ALL the source code for your convenience and to help you experience 
 * uC/OS-II.   The fact that the  source is provided does  NOT  mean that you can use it without  paying a 
 * licensing fee.
@@ -346,7 +346,7 @@ void  OSIntExit (void)
 
    if(OSRunning==OS_TRUE) 
 	  {
-        OS_ENTER_CRITICAL();  //±£¥Ê»´æ÷÷–∂œ±Í÷æ,πÿ÷–∂œ
+        OS_ENTER_CRITICAL();  //‰øùÂ≠òÂÖ®Â±Ä‰∏≠Êñ≠Ê†áÂøó,ÂÖ≥‰∏≠Êñ≠
         if(OSIntNesting>0) 	 /* Prevent OSIntNesting from wrapping       */
 		  {                           
             OSIntNesting--;
@@ -367,7 +367,7 @@ void  OSIntExit (void)
                     }
                 }
           }
-        OS_EXIT_CRITICAL();	 //ª÷∏¥÷Æ«∞µƒ÷–∂œ±Í÷æ
+        OS_EXIT_CRITICAL();	 //ÊÅ¢Â§ç‰πãÂâçÁöÑ‰∏≠Êñ≠Ê†áÂøó
       }
 }
 /*$PAGE*/
@@ -1235,12 +1235,12 @@ void  OS_Sched(void)
 
 
 
-    OS_ENTER_CRITICAL();  //±£¥Ê»´æ÷÷–∂œ±Í÷æ,πÿ÷–∂œ
+    OS_ENTER_CRITICAL();  //‰øùÂ≠òÂÖ®Â±Ä‰∏≠Êñ≠Ê†áÂøó,ÂÖ≥‰∏≠Êñ≠
     if(OSIntNesting==0) 	 /* Schedule only if all ISRs done and ...*/
 	  {                          
         if(OSLockNesting==0)   /* ... scheduler is not locked */
 		  {                     
-            OS_SchedNew(); //º∆À„æÕ–˜»ŒŒÒ¿Ô”≈œ»º∂◊Ó∏ﬂµƒ”≈œ»º∂,Ω·π˚±£¥Ê‘⁄OSPrioHighRdy¿Ô
+            OS_SchedNew(); //ËÆ°ÁÆóÂ∞±Áª™‰ªªÂä°Èáå‰ºòÂÖàÁ∫ßÊúÄÈ´òÁöÑ‰ºòÂÖàÁ∫ß,ÁªìÊûú‰øùÂ≠òÂú®OSPrioHighRdyÈáå
             if(OSPrioHighRdy!=OSPrioCur)   /* No Ctx Sw if current task is highest rdy  */
 			   {         
                  OSTCBHighRdy = OSTCBPrioTbl[OSPrioHighRdy];
@@ -1248,11 +1248,11 @@ void  OS_Sched(void)
                     OSTCBHighRdy->OSTCBCtxSwCtr++;         /* Inc. # of context switches to this task */
                  #endif
                  OSCtxSwCtr++;   /* Increment context switch counter */
-                 OS_TASK_SW();   //–¸∆PSV“Ï≥£   /* Perform a context switch */
+                 OS_TASK_SW();   //ÊÇ¨Ëµ∑PSVÂºÇÂ∏∏   /* Perform a context switch */
                }
            }
        }
-     OS_EXIT_CRITICAL(); //ª÷∏¥»´æ÷÷–∂œ±Í÷æ
+     OS_EXIT_CRITICAL(); //ÊÅ¢Â§çÂÖ®Â±Ä‰∏≠Êñ≠Ê†áÂøó
 }
 
 

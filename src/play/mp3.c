@@ -1,8 +1,8 @@
 /*
- * 1,Ö§³Ö16Î»µ¥ÉùµÀ/Á¢ÌåÉùMP3µÄ½âÂë
- * 2,Ö§³ÖCBR/VBR¸ñÊ½MP3½âÂë
- * 3,Ö§³ÖID3V1ºÍID3V2±êÇ©½âÎö
- * 4,Ö§³ÖËùÓĞ±ÈÌØÂÊ(MP3×î¸ßÊÇ320Kbps)½âÂë
+ * 1,æ”¯æŒ16ä½å•å£°é“/ç«‹ä½“å£°MP3çš„è§£ç 
+ * 2,æ”¯æŒCBR/VBRæ ¼å¼MP3è§£ç 
+ * 3,æ”¯æŒID3V1å’ŒID3V2æ ‡ç­¾è§£æ
+ * 4,æ”¯æŒæ‰€æœ‰æ¯”ç‰¹ç‡(MP3æœ€é«˜æ˜¯320Kbps)è§£ç 
  */
 #include <string.h>
 #include <assert.h>
@@ -13,22 +13,22 @@
 
 #define AUDIO_MIN(x,y)	((x)<(y)? (x):(y))
 
-MP3CTRL * mp3ctrl;	//mp3¿ØÖÆ½á¹¹Ìå
-volatile u8 mp3transferend = 0;	//i2s´«ÊäÍê³É±êÖ¾
-volatile u8 mp3witchbuf = 0;	//i2sbufxÖ¸Ê¾±êÖ¾
+MP3CTRL * mp3ctrl;	//mp3æ§åˆ¶ç»“æ„ä½“
+volatile u8 mp3transferend = 0;	//i2sä¼ è¾“å®Œæˆæ ‡å¿—
+volatile u8 mp3witchbuf = 0;	//i2sbufxæŒ‡ç¤ºæ ‡å¿—
 
 
 /*
- * ½âÎöID3V1
- * buf:ÊäÈëÊı¾İ»º´æÇø(´óĞ¡¹Ì¶¨ÊÇ128×Ö½Ú)
- * pctrl:MP3¿ØÖÆÆ÷
- * ·µ»ØÖµ:=0,Õı³£,ÆäËû,»ñÈ¡Ê§°Ü
+ * è§£æID3V1
+ * buf:è¾“å…¥æ•°æ®ç¼“å­˜åŒº(å¤§å°å›ºå®šæ˜¯128å­—èŠ‚)
+ * pctrl:MP3æ§åˆ¶å™¨
+ * è¿”å›å€¼:=0,æ­£å¸¸,å…¶ä»–,è·å–å¤±è´¥
  */
 u8 mp3_id3v1_decode(u8* buf, MP3CTRL *pctrl) {
 	ID3V1_Tag *id3v1tag;
 	id3v1tag = (ID3V1_Tag*)buf;
 	if (strncmp("TAG", (char*)id3v1tag->id, 3) == 0) {
-		//ÊÇMP3 ID3V1 TAG
+		//æ˜¯MP3 ID3V1 TAG
 		if (id3v1tag->title[0])
 			strncpy((char*)pctrl->title, (char*)id3v1tag->title, 30);
 		if (id3v1tag->artist[0])
@@ -38,11 +38,11 @@ u8 mp3_id3v1_decode(u8* buf, MP3CTRL *pctrl) {
 	return 0;
 }
 /*
- * ½âÎöID3V2
- * buf:ÊäÈëÊı¾İ»º´æÇø(´óĞ¡¹Ì¶¨ÊÇ128×Ö½Ú)
- * size:Êı¾İ´óĞ¡
- * pctrl:MP3¿ØÖÆÆ÷
- * ·µ»ØÖµ:=0,Õı³£,ÆäËû,»ñÈ¡Ê§°Ü
+ * è§£æID3V2
+ * buf:è¾“å…¥æ•°æ®ç¼“å­˜åŒº(å¤§å°å›ºå®šæ˜¯128å­—èŠ‚)
+ * size:æ•°æ®å¤§å°
+ * pctrl:MP3æ§åˆ¶å™¨
+ * è¿”å›å€¼:=0,æ­£å¸¸,å…¶ä»–,è·å–å¤±è´¥
  */
 u8 mp3_id3v2_decode(u8* buf, u32 size, MP3CTRL *pctrl) {
 	u8* buff = buf;
@@ -50,22 +50,22 @@ u8 mp3_id3v2_decode(u8* buf, u32 size, MP3CTRL *pctrl) {
 	ID3V2_TagHead *taghead = (ID3V2_TagHead*)buf;
 	buf += sizeof(ID3V2_TagHead);
 	if (strncmp("ID3", taghead->id, 3)) {
-		//²»´æÔÚID3,mp3Êı¾İÊÇ´Ó0¿ªÊ¼
+		//ä¸å­˜åœ¨ID3,mp3æ•°æ®æ˜¯ä»0å¼€å§‹
 		pctrl->datastart = 0;
 		return 0;
 	}
-	//µÃµ½tag ´óĞ¡
-	//Ò»¹²ËÄ¸ö×Ö½Ú£¬µ«Ã¿¸ö×Ö½ÚÖ»ÓÃ7Î»£¬×î¸ßÎ»²»Ê¹ÓÃºãÎª0¡£ËùÒÔ¸ñÊ½ÈçÏÂ
+	//å¾—åˆ°tag å¤§å°
+	//ä¸€å…±å››ä¸ªå­—èŠ‚ï¼Œä½†æ¯ä¸ªå­—èŠ‚åªç”¨7ä½ï¼Œæœ€é«˜ä½ä¸ä½¿ç”¨æ’ä¸º0ã€‚æ‰€ä»¥æ ¼å¼å¦‚ä¸‹
 	//0xxxxxxx 0xxxxxxx 0xxxxxxx 0xxxxxxx
-	//¼ÆËã´óĞ¡Ê±Òª½«0 È¥µô£¬µÃµ½Ò»¸ö28 Î»µÄ¶ş½øÖÆÊı
+	//è®¡ç®—å¤§å°æ—¶è¦å°†0 å»æ‰ï¼Œå¾—åˆ°ä¸€ä¸ª28 ä½çš„äºŒè¿›åˆ¶æ•°
 	u32 tagsize = ((u32)taghead->size[0] << 21)
 				  | ((u32)taghead->size[1] << 14)
 				  | ((u16)taghead->size[2] << 7)
 				  | taghead->size[3];
 
-	pctrl->datastart = tagsize;		//µÃµ½mp3Êı¾İ¿ªÊ¼µÄÆ«ÒÆÁ¿
+	pctrl->datastart = tagsize;		//å¾—åˆ°mp3æ•°æ®å¼€å§‹çš„åç§»é‡
 	if (tagsize > size) {
-		//tagsize´óÓÚÊäÈëbufsizeµÄÊ±ºò,Ö»´¦ÀíÊäÈësize´óĞ¡µÄÊı¾İ
+		//tagsizeå¤§äºè¾“å…¥bufsizeçš„æ—¶å€™,åªå¤„ç†è¾“å…¥sizeå¤§å°çš„æ•°æ®
 		tagsize = size;
 	}
 
@@ -76,7 +76,7 @@ u8 mp3_id3v2_decode(u8* buf, u32 size, MP3CTRL *pctrl) {
 	while (buf < buff + size) {
 		ID3V23_FrameHead *framehead = (ID3V23_FrameHead*)(buf);
 
-		//µÃµ½Ö¡´óĞ¡
+		//å¾—åˆ°å¸§å¤§å°
 		u32 frame_size = ((u32)framehead->size[0] << 24)
 						 | ((u32)framehead->size[1] << 16)
 						 | ((u32)framehead->size[2] << 8)
@@ -84,12 +84,12 @@ u8 mp3_id3v2_decode(u8* buf, u32 size, MP3CTRL *pctrl) {
 
 		if (strncmp("TT2", framehead->id, 3) == 0
 				|| strncmp("TIT2", framehead->id, 4) == 0) {
-			//ÕÒµ½¸èÇú±êÌâÖ¡,²»Ö§³Öunicode¸ñÊ½!!
+			//æ‰¾åˆ°æ­Œæ›²æ ‡é¢˜å¸§,ä¸æ”¯æŒunicodeæ ¼å¼!!
 			strncpy((char*)pctrl->title, buf + sizeof(ID3V23_FrameHead) + 1, AUDIO_MIN(frame_size - 1, MP3_TITSIZE_MAX - 1));
 		}
 		if (strncmp("TP1", framehead->id, 3) == 0
 				|| strncmp("TPE1", framehead->id, 4) == 0) {
-			//ÕÒµ½¸èÇúÒÕÊõ¼ÒÖ¡
+			//æ‰¾åˆ°æ­Œæ›²è‰ºæœ¯å®¶å¸§
 			strncpy((char*)pctrl->artist, (char*)(buf + sizeof(ID3V23_FrameHead) + 1), AUDIO_MIN(frame_size - 1, MP3_ARTSIZE_MAX - 1));
 		}
 		buf += frame_size + sizeof(ID3V23_FrameHead);
@@ -99,126 +99,126 @@ u8 mp3_id3v2_decode(u8* buf, u32 size, MP3CTRL *pctrl) {
 }
 
 /*
- * »ñÈ¡MP3»ù±¾ĞÅÏ¢
- * pname:MP3ÎÄ¼şÂ·¾¶
- * pctrl:MP3¿ØÖÆĞÅÏ¢½á¹¹Ìå
- * ·µ»ØÖµ:0,³É¹¦
- *     ÆäËû,Ê§°Ü
+ * è·å–MP3åŸºæœ¬ä¿¡æ¯
+ * pname:MP3æ–‡ä»¶è·¯å¾„
+ * pctrl:MP3æ§åˆ¶ä¿¡æ¯ç»“æ„ä½“
+ * è¿”å›å€¼:0,æˆåŠŸ
+ *     å…¶ä»–,å¤±è´¥
  */
 u8 mp3_get_info(FIL *fmp3, u8 *buf, u32 size, MP3CTRL *pctrl) {
 	MP3FrameInfo frame_info;
 	u32 br;
 	u8 res = 0;
 	u32 p;
-	short samples_per_frame;	//Ò»Ö¡µÄ²ÉÑù¸öÊı
-	u32 totframes;				//×ÜÖ¡Êı
+	short samples_per_frame;	//ä¸€å¸§çš„é‡‡æ ·ä¸ªæ•°
+	u32 totframes;				//æ€»å¸§æ•°
 
 
-	//¿ªÊ¼½âÎöID3V2/ID3V1ÒÔ¼°»ñÈ¡MP3ĞÅÏ¢
+	//å¼€å§‹è§£æID3V2/ID3V1ä»¥åŠè·å–MP3ä¿¡æ¯
 	f_lseek(fmp3, 0);
 	f_read(fmp3, buf, size, &br);
-	mp3_id3v2_decode(buf, br, pctrl);			//½âÎöID3V2Êı¾İ
+	mp3_id3v2_decode(buf, br, pctrl);			//è§£æID3V2æ•°æ®
 
-	f_lseek(fmp3, fmp3->fsize - 128);			//Æ«ÒÆµ½µ¹Êı128µÄÎ»ÖÃ
-	f_read(fmp3, buf, 128, &br);				//¶ÁÈ¡128×Ö½Ú
-	mp3_id3v1_decode(buf, pctrl);				//½âÎöID3V1Êı¾İ
+	f_lseek(fmp3, fmp3->fsize - 128);			//åç§»åˆ°å€’æ•°128çš„ä½ç½®
+	f_read(fmp3, buf, 128, &br);				//è¯»å–128å­—èŠ‚
+	mp3_id3v1_decode(buf, pctrl);				//è§£æID3V1æ•°æ®
 
-	HMP3Decoder decoder = MP3InitDecoder(); 	//MP3½âÂëÉêÇëÄÚ´æ
-	f_lseek(fmp3, pctrl->datastart);			//Æ«ÒÆµ½Êı¾İ¿ªÊ¼µÄµØ·½
-	f_read(fmp3, buf, size, &br);			//¶ÁÈ¡5K×Ö½Úmp3Êı¾İ
-	int offset = MP3FindSyncWord(buf, br);		//²éÕÒÖ¡Í¬²½ĞÅÏ¢
+	HMP3Decoder decoder = MP3InitDecoder(); 	//MP3è§£ç ç”³è¯·å†…å­˜
+	f_lseek(fmp3, pctrl->datastart);			//åç§»åˆ°æ•°æ®å¼€å§‹çš„åœ°æ–¹
+	f_read(fmp3, buf, size, &br);			//è¯»å–5Kå­—èŠ‚mp3æ•°æ®
+	int offset = MP3FindSyncWord(buf, br);		//æŸ¥æ‰¾å¸§åŒæ­¥ä¿¡æ¯
 
 	if (offset < 0 || MP3GetNextFrameInfo(decoder, &frame_info, &buf[offset])) {
-		res = 0XFE; //Î´ÕÒµ½Í¬²½Ö¡
-		printf("Î´ÕÒµ½Í¬²½Ö¡\n");
+		res = 0XFE; //æœªæ‰¾åˆ°åŒæ­¥å¸§
+		printf("æœªæ‰¾åˆ°åŒæ­¥å¸§\n");
 		goto exit;
 	}
 
 	printf("%lu bp/s audio MPEG layer %d, %d Hz sample rate,  %d Chanel , outputSamps:%d.\n",
 		   frame_info.bitrate, frame_info.layer, frame_info.samprate, frame_info.nChans, frame_info.outputSamps);
 	if ((frame_info.layer < 3) || (frame_info.bitrate <= 0) || (frame_info.samprate <= 0)) {
-		//((mp3FrameInfo.bitrate>=320000) ¸ßÂëÂÊµÄ inputbuf´óĞ¡ÒªÉè´ó£¬
-		//helixÖ»Ö§³Ö MP3 ½âÂë, .vbrµÄÎÄ¼ş µÃµ½µÄÒ»Ğ©²ÎÊıÄªÃûÆäÃî
+		//((mp3FrameInfo.bitrate>=320000) é«˜ç ç‡çš„ inputbufå¤§å°è¦è®¾å¤§ï¼Œ
+		//helixåªæ”¯æŒ MP3 è§£ç , .vbrçš„æ–‡ä»¶ å¾—åˆ°çš„ä¸€äº›å‚æ•°è«åå…¶å¦™
 		printf("bitrate or layer not support!\n");
 		res = 1;
 		goto exit;
 	}
-	//ÕÒµ½Ö¡Í¬²½ĞÅÏ¢ÁË,ÇÒÏÂÒ»Ö¡ĞÅÏ¢»ñÈ¡Õı³£
+	//æ‰¾åˆ°å¸§åŒæ­¥ä¿¡æ¯äº†,ä¸”ä¸‹ä¸€å¸§ä¿¡æ¯è·å–æ­£å¸¸
 	p = offset + 4 + 32;
 	MP3_FrameVBRI *fvbri = (MP3_FrameVBRI*)(buf + p);
 	if (strncmp("VBRI", fvbri->id, 4) == 0) {
-		//´æÔÚVBRIÖ¡(VBR¸ñÊ½)
+		//å­˜åœ¨VBRIå¸§(VBRæ ¼å¼)
 		if (frame_info.version == MPEG1) {
-			//MPEG1,layer3Ã¿Ö¡²ÉÑùÊıµÈÓÚ1152
+			//MPEG1,layer3æ¯å¸§é‡‡æ ·æ•°ç­‰äº1152
 			samples_per_frame = 1152;
 		} else {
-			//MPEG2/MPEG2.5,layer3Ã¿Ö¡²ÉÑùÊıµÈÓÚ576
+			//MPEG2/MPEG2.5,layer3æ¯å¸§é‡‡æ ·æ•°ç­‰äº576
 			samples_per_frame = 576;
 		}
-		//µÃµ½×ÜÖ¡Êı
+		//å¾—åˆ°æ€»å¸§æ•°
 		totframes = ((u32)fvbri->frames[0] << 24)
 					| ((u32)fvbri->frames[1] << 16)
 					| ((u16)fvbri->frames[2] << 8)
 					| fvbri->frames[3];
 
-		//µÃµ½ÎÄ¼ş×Ü³¤¶È
+		//å¾—åˆ°æ–‡ä»¶æ€»é•¿åº¦
 		pctrl->totsec = totframes * samples_per_frame / frame_info.samprate;
 	} else {
-		//²»ÊÇVBRIÖ¡,³¢ÊÔÊÇ²»ÊÇXingÖ¡(VBR¸ñÊ½)
+		//ä¸æ˜¯VBRIå¸§,å°è¯•æ˜¯ä¸æ˜¯Xingå¸§(VBRæ ¼å¼)
 		if (frame_info.version == MPEG1) {
 			p = frame_info.nChans == 2 ? 32 : 17;
-			//MPEG1,layer3Ã¿Ö¡²ÉÑùÊıµÈÓÚ1152
+			//MPEG1,layer3æ¯å¸§é‡‡æ ·æ•°ç­‰äº1152
 			samples_per_frame = 1152;
 		} else {
 			p = frame_info.nChans == 2 ? 17 : 9;
-			//MPEG2/MPEG2.5,layer3Ã¿Ö¡²ÉÑùÊıµÈÓÚ576
+			//MPEG2/MPEG2.5,layer3æ¯å¸§é‡‡æ ·æ•°ç­‰äº576
 			samples_per_frame = 576;
 		}
 
 		p += offset + 4;
 		MP3_FrameXing *fxing = (MP3_FrameXing*)(buf + p);
 
-		if (strncmp("Xing", (char*)fxing->id, 4) == 0 || strncmp("Info", (char*)fxing->id, 4) == 0) { //ÊÇXingÖ¡
+		if (strncmp("Xing", (char*)fxing->id, 4) == 0 || strncmp("Info", (char*)fxing->id, 4) == 0) { //æ˜¯Xingå¸§
 			if (fxing->flags[3] & 0X01) {
-				//´æÔÚ×Üframe×Ö¶Î
-				//µÃµ½×ÜÖ¡Êı
+				//å­˜åœ¨æ€»frameå­—æ®µ
+				//å¾—åˆ°æ€»å¸§æ•°
 				totframes = ((u32)fxing->frames[0] << 24)
 							| ((u32)fxing->frames[1] << 16)
 							| ((u16)fxing->frames[2] << 8)
 							| fxing->frames[3];
 
-				pctrl->totsec = totframes * samples_per_frame / frame_info.samprate; //µÃµ½ÎÄ¼ş×Ü³¤¶È
+				pctrl->totsec = totframes * samples_per_frame / frame_info.samprate; //å¾—åˆ°æ–‡ä»¶æ€»é•¿åº¦
 			} else {
-				//²»´æÔÚ×Üframes×Ö¶Î
+				//ä¸å­˜åœ¨æ€»frameså­—æ®µ
 				pctrl->totsec = fmp3->fsize / (frame_info.bitrate / 8);
 			}
 		} else {
-			//CBR¸ñÊ½,Ö±½Ó¼ÆËã×Ü²¥·ÅÊ±¼ä
+			//CBRæ ¼å¼,ç›´æ¥è®¡ç®—æ€»æ’­æ”¾æ—¶é—´
 			pctrl->totsec = fmp3->fsize / (frame_info.bitrate / 8);
 		}
 	}
-	pctrl->bitrate = frame_info.bitrate;		//µÃµ½µ±Ç°Ö¡µÄÂëÂÊ
-	mp3ctrl->samplerate = frame_info.samprate;	//µÃµ½²ÉÑùÂÊ.
+	pctrl->bitrate = frame_info.bitrate;		//å¾—åˆ°å½“å‰å¸§çš„ç ç‡
+	mp3ctrl->samplerate = frame_info.samprate;	//å¾—åˆ°é‡‡æ ·ç‡.
 	if (frame_info.nChans == 2) {
-		//Êä³öPCMÊı¾İÁ¿´óĞ¡
+		//è¾“å‡ºPCMæ•°æ®é‡å¤§å°
 		mp3ctrl->outsamples = frame_info.outputSamps;
 	} else {
-		//Êä³öPCMÊı¾İÁ¿´óĞ¡,¶ÔÓÚµ¥ÉùµÀMP3,Ö±½Ó*2,²¹ÆëÎªË«ÉùµÀÊä³ö
+		//è¾“å‡ºPCMæ•°æ®é‡å¤§å°,å¯¹äºå•å£°é“MP3,ç›´æ¥*2,è¡¥é½ä¸ºåŒå£°é“è¾“å‡º
 		mp3ctrl->outsamples = frame_info.outputSamps * 2;
 	}
 exit:
-	MP3FreeDecoder(decoder);//ÊÍ·ÅÄÚ´æ
+	MP3FreeDecoder(decoder);//é‡Šæ”¾å†…å­˜
 	return res;
 }
 
-//µÃµ½µ±Ç°²¥·ÅÊ±¼ä
+//å¾—åˆ°å½“å‰æ’­æ”¾æ—¶é—´
 void mp3_get_curtime(FIL*fx, MP3CTRL *mp3x) {
 	u32 fpos = 0;
 	if (fx->fptr > mp3x->datastart) {
-		//µÃµ½µ±Ç°ÎÄ¼ş²¥·Åµ½µÄµØ·½
+		//å¾—åˆ°å½“å‰æ–‡ä»¶æ’­æ”¾åˆ°çš„åœ°æ–¹
 		fpos = fx->fptr - mp3x->datastart;
 	}
 
-	//µ±Ç°²¥·Åµ½µÚ¶àÉÙÃëÁË?
+	//å½“å‰æ’­æ”¾åˆ°ç¬¬å¤šå°‘ç§’äº†?
 	mp3x->cursec = fpos * mp3x->totsec / (fx->fsize - mp3x->datastart);
 }

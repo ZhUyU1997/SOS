@@ -2,7 +2,7 @@
 #define __CPU_H__
 
 
-/*–°∂À,*/
+/*Â∞èÁ´Ø,*/
 #define BYTE_ORDER LITTLE_ENDIAN
 
 

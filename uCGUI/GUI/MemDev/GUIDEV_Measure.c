@@ -285,7 +285,7 @@ static const tLCDDEV_APIList _APIList = {
   _FillPolygon,
   _FillPolygonAA,
   NULL,
-  /*NULL*/ 0 //�޸ģ�����  
+  /*NULL*/ 0 //修改：华兄  
 };
 
 /*********************************************************************

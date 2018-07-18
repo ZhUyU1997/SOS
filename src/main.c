@@ -27,7 +27,7 @@ FATFS fatworkarea;         // Work area (file system object) for logical drives
 void show_bss_info(){
 	extern char __bss_start, __bss_end;
     unsigned int size = &__bss_end - &__bss_start;
-	printf("BSS´óĞ¡Îª£º%uKB, %uMB\n", size/1024, size/1024/1024);
+	printf("BSSå¤§å°ä¸ºï¼š%uKB, %uMB\n", size/1024, size/1024/1024);
 }
 static void initer(void (*init)(), char *msg){
 	assert(init);
@@ -59,15 +59,15 @@ void OSMainTask(void *pdata) {
 	OS_EXIT_CRITICAL();
 
 #if (OS_TASK_STAT_EN > 0)
-	OSStatInit();		//----Í³¼ÆÈÎÎñ³õÊ¼»¯º¯Êı
+	OSStatInit();		//----ç»Ÿè®¡ä»»åŠ¡åˆå§‹åŒ–å‡½æ•°
 #endif
 
 #ifdef CONFIG_LWIP
-	printf("³õÊ¼»¯ÍøÂç...\n");
+	printf("åˆå§‹åŒ–ç½‘ç»œ...\n");
 	net_init();
 #endif
 
-	printf("´´½¨ÈÎÎñ0...\n");
+	printf("åˆ›å»ºä»»åŠ¡0...\n");
 	OSTaskCreate (Task0, (void *)0, &Task0Stk[Task0StkLengh - 1], Task0Prio);
 	INT8U  err;
 	OSTaskNameSet(Task0Prio, (INT8U *)"Task0", &err);
@@ -80,7 +80,7 @@ void OSMainTask(void *pdata) {
 
 
 void Task0(void *pdata) {
-	printf("ÈÎÎñ0Æô¶¯...\n");
+	printf("ä»»åŠ¡0å¯åŠ¨...\n");
 	while (1) {
 		cmd_loop();
 	}
@@ -89,15 +89,15 @@ void Task0(void *pdata) {
 void ucosii_init(){
 	OSInit ();
 
-	printf("³õÊ¼»¯ÏµÍ³Ê±ÖÓ...\n");
+	printf("åˆå§‹åŒ–ç³»ç»Ÿæ—¶é’Ÿ...\n");
 	OSTimeSet(0);
 
-	printf("´´½¨ÏµÍ³³õÊ¼ÈÎÎñ...\n");
+	printf("åˆ›å»ºç³»ç»Ÿåˆå§‹ä»»åŠ¡...\n");
 	OSTaskCreate (OSMainTask, (void *)0, &MainTaskStk[MainTaskStkLengh - 1], MainTaskPrio);
 	INT8U  err;
 	OSTaskNameSet(MainTaskPrio, (INT8U *)"MainTask", &err);
 
-	printf("Æô¶¯uC/OS...\n");
+	printf("å¯åŠ¨uC/OS...\n");
 	OSStart ();
 }
 #endif
@@ -110,33 +110,33 @@ int main() {
 	printf("\n\n************************************************\n");
 	show_bss_info();
 
-	printf("³õÊ¼»¯MMU...\n");
+	printf("åˆå§‹åŒ–MMU...\n");
 	mmu_init();
 
-	printf("³õÊ¼»¯TIMER...\n");
+	printf("åˆå§‹åŒ–TIMER...\n");
 	timer_init();
 
-	printf("³õÊ¼»¯TICK...\n");
+	printf("åˆå§‹åŒ–TICK...\n");
 	init_tick(1000, NULL);
 
-	printf("³õÊ¼»¯LCD...\n");
-	Lcd_Port_Init();						// ÉèÖÃLCDÒı½Å
-	Tft_Lcd_Init(MODE_TFT_16BIT_480272);	// ³õÊ¼»¯LCD¿ØÖÆ
-	Lcd_PowerEnable(0, 1);					// ÉèÖÃLCD_PWRENÓĞĞ§£¬ËüÓÃÓÚ´ò¿ªLCDµÄµçÔ´
-	Lcd_EnvidOnOff(1);						// Ê¹ÄÜLCD¿ØÖÆÆ÷Êä³öĞÅºÅ
-	ClearScr(0x0);							// ÇåÆÁ
+	printf("åˆå§‹åŒ–LCD...\n");
+	Lcd_Port_Init();						// è®¾ç½®LCDå¼•è„š
+	Tft_Lcd_Init(MODE_TFT_16BIT_480272);	// åˆå§‹åŒ–LCDæ§åˆ¶
+	Lcd_PowerEnable(0, 1);					// è®¾ç½®LCD_PWRENæœ‰æ•ˆï¼Œå®ƒç”¨äºæ‰“å¼€LCDçš„ç”µæº
+	Lcd_EnvidOnOff(1);						// ä½¿èƒ½LCDæ§åˆ¶å™¨è¾“å‡ºä¿¡å·
+	ClearScr(0x0);							// æ¸…å±
 
-	printf("³õÊ¼»¯SD¿ØÖÆÆ÷...\n");
+	printf("åˆå§‹åŒ–SDæ§åˆ¶å™¨...\n");
 	SDI_init();
 
-	printf("³õÊ¼»¯fatfs...\n");
+	printf("åˆå§‹åŒ–fatfs...\n");
 	f_mount(0,&fatworkarea);
 
-	printf("Ê¹ÄÜIRQ...\n");
+	printf("ä½¿èƒ½IRQ...\n");
 	enable_irq();
 
 #ifdef CONFIG_UCOS2
-	printf("³õÊ¼»¯uC/OS...\n");
+	printf("åˆå§‹åŒ–uC/OS...\n");
 	ucosii_init();
 #else
 	cmd_loop();
