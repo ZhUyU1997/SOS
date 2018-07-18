@@ -8,9 +8,9 @@
 /********************************************************
  宏定义
 ********************************************************/
-#define __SD_MMC_DEBUG__
+#define __SD_MMC_DEBUG__ 0
 
-#ifdef __SD_MMC_DEBUG__
+#if __SD_MMC_DEBUG__
 #define SD_DEBUG(fmt,args...) printf(fmt,##args)
 #else
 #define SD_DEBUG(fmt,args...)
