@@ -14,7 +14,7 @@ RM				= rm
 export AS LD CC CPP AR NM
 export STRIP OBJCOPY OBJDUMP
 export RM
-TOPDIR			:= $(subst /c,c:,$(shell pwd))
+TOPDIR			:= $(CURDIR)
 
 INCLUDEDIR 		:= $(TOPDIR)/include
 #WFLAGS			:= -Wall
