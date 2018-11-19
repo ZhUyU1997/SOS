@@ -29,7 +29,6 @@ lib_objs	:= $(filter-out %/, $(libobj-y))
 dep_files	:= $(foreach f,$(cur_objs) $(lib_objs),.$(f).d)
 dep_files	:= $(wildcard $(dep_files))
 
-CURDIR		:= $(shell pwd)
 
 ifneq ($(dep_files),)
   include $(dep_files)
@@ -71,7 +70,6 @@ PHONY		+= $(alldir)
 
 __build : $(OBJNAME) $(LIBNAME)
 $(alldir):
-	@echo $(CURDIR)/$@:
 	make -C $@ -f $(TOPDIR)/Makefile.build
 
 define DIR_RULE

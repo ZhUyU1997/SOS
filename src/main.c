@@ -3,6 +3,7 @@
 #include <interrupt.h>
 #include <serial.h>
 #include <assert.h>
+#include <global_config.h>
 #include "command.h"
 
 //lcd driver

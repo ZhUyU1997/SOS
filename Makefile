@@ -51,7 +51,6 @@ obj-y += sound/
 
 .PHONY : all dis download clean distclean
 all:
-	@echo $(shell pwd):
 	@make -s -C ./ -f $(TOPDIR)/Makefile.build
 	@$(LD) -o system_temp built-in.o $(LDFLAGS)
 	@gcc -o kallsyms $(TOPDIR)/scripts/kallsyms.c
@@ -75,7 +74,7 @@ clean:
 
 distclean:
 	rm -f $(shell find -name "*.o")
-	rm -f $(shell find -name "*.d")
+	rm -f $(shell find -name ".*.d")
 	rm -f $(shell find -name "*.a")
 	rm -f $(shell find -name "*.mac")
 	rm -f $(TARGET) $(TARGET).dis $(TARGET).bin system system_temp kallsyms.S kallsyms.exe
