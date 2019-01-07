@@ -1,80 +1,262 @@
-CROSS_COMPILE	= arm-none-linux-gnueabi-
-AS				= $(CROSS_COMPILE)as
-LD				= $(CROSS_COMPILE)ld
-CC				= $(CROSS_COMPILE)gcc
-CPP				= $(CC) -E
-AR				= $(CROSS_COMPILE)ar
-NM				= $(CROSS_COMPILE)nm
-
-STRIP			= $(CROSS_COMPILE)strip
-OBJCOPY			= $(CROSS_COMPILE)objcopy
-OBJDUMP			= $(CROSS_COMPILE)objdump
-
-RM				= rm
-export AS LD CC CPP AR NM
-export STRIP OBJCOPY OBJDUMP
-export RM
-TOPDIR			:= $(CURDIR)
-
-INCLUDEDIR 		:= $(TOPDIR)/include
-#WFLAGS			:= -Wall
-WFLAGS			:= -w
-CFLAGS 			:= -std=gnu99 $(WFLAGS) -O2 -fno-builtin -march=armv4t -mtune=arm920t -nostdlib -nostdinc -msoft-float -fsigned-char -fno-omit-frame-pointer
-CFLAGS   		+= -I$(INCLUDEDIR) -I$(TOPDIR)/ucos2/SOURCE -iquote$(TOPDIR)/ucos2/PORT \
-				-iquote$(TOPDIR)/uCGUI/Config \
-				-iquote$(TOPDIR)/uCGUI/GUI/Core -iquote$(TOPDIR)/uCGUI/GUI/WM -iquote$(TOPDIR)/uCGUI/GUI/Widget \
-				-I$(TOPDIR)/lwip/include -iquote$(TOPDIR)/lwip/include/arch \
-				-iquote$(TOPDIR)/lwip/include/ipv4 \
-				-I$(TOPDIR)/drivers \
-				-I$(TOPDIR)/fs/Fatfs_f8a \
-				-iquote$(TOPDIR)/src/helix/pub
-LDFLAGS			:= -L$(shell dirname `$(CC) $(CFLAGS) -print-libgcc-file-name`) -L$(TOPDIR)/uCGUI
-#LDFLAGS		+= -lucgui
-LDFLAGS			+= -lgcc
-LDFLAGS			+= -Tucosii.lds 
-
-export CFLAGS LDFLAGS
-export TOPDIR
-
-TARGET := ucosii
-
-obj-y += init/
-obj-y += drivers/
-obj-y += src/
-obj-y += lib/
-obj-y += mm/
-#obj-y += ucos2/
-#obj-y += uCGUI/
-#obj-y += lwip/
-obj-y += fs/
-obj-y += sound/
-
-.PHONY : all dis download clean distclean
+PHONY		:=
 all:
-	@make -s -C ./ -f $(TOPDIR)/Makefile.build
-	@$(LD) -o system_temp built-in.o $(LDFLAGS)
-	@gcc -o kallsyms $(TOPDIR)/scripts/kallsyms.c
-	@nm -n system_temp | ./kallsyms > kallsyms.S
-	@$(CC) $(CFLAGS) -c -o kallsyms.o kallsyms.S
-	@echo LD system
-	@$(LD) -o system built-in.o kallsyms.o $(LDFLAGS)
-	@echo OBJCOPY $(TARGET).bin
-	@$(OBJCOPY) -O binary -S system $(TARGET).bin
 
-dis:system
-	@echo OBJDUMP $(TARGET).dis
-	@$(OBJDUMP) -D -m arm system > $(TARGET).dis
+# Do not:
+# o  use make's built-in rules and variables
+#    (this increases performance and avoids hard-to-debug behaviour);
+# o  print "Entering directory ...";
+MAKEFLAGS	+= -rR -s --no-print-directory
 
-dnw:$(TARGET).bin
-	dnw $(TARGET).bin
+BUILD_SRC	:=
+BUILD_OBJ	:=
+
+MKDIR		:=	mkdir -p
+CP			:=	cp -af
+RM			:=	rm -rf
+CD			:=	cd
+MV			:=	mv
+FIND		:=	find
+
+export RM CP CD MV FIND MKDIR
+
+ifeq ($(BUILD_SRC),)
+
+ifeq ("$(origin O)", "command line")
+BUILD_OBJ	:= $(O)
+endif
+
+ifneq ($(BUILD_OBJ),)
+PHONY	+=	all $(MAKECMDGOALS) clean
+
+__dummy		:= $(shell $(MKDIR) $(BUILD_OBJ))
+
+ifneq ($(__dummy),)
+$(error failed to create $(BUILD_OBJ))
+endif
+
+$(filter-out all,$(MAKECMDGOALS)) all: sub-mk
+
+sub-mk:
+	@$(MAKE) -C $(BUILD_OBJ) BUILD_SRC=$(CURDIR) -f $(CURDIR)/Makefile $(MAKECMDGOALS)
+
+clean: sub-mk
+	@echo [RM] $(BUILD_OBJ)
+	@$(RM) $(BUILD_OBJ)
+
+skip-makefile := 1
+endif #ifneq ($(BUILD_OBJ),)
+endif #ifeq ($(BUILD_SRC),)
+
+
+ifeq ($(skip-makefile),)
+
+CROSS_COMPILE	?=arm-none-linux-gnueabi-
+PLATFORM		?=
+
+srctree		:= $(if $(BUILD_SRC),$(BUILD_SRC),$(CURDIR))
+objtree		:= $(CURDIR)
+src			:= .
+obj			:= .
+
+VPATH		:= $(srctree)
+
+export srctree objtree VPATH
+
+# Get platform information about ARCH and MACH from PLATFORM variable.
+ifeq ($(words $(subst -, , $(PLATFORM))), 2)
+ARCH		:= $(word 1, $(subst -, , $(PLATFORM)))
+MACH		:= mach-$(word 2, $(subst -, , $(PLATFORM)))
+else
+ARCH		:= arm32
+MACH		:= mach-jz2440
+endif
+
+ifeq ($(wildcard $(srctree)/arch/$(ARCH)/$(MACH)),)
+$(error not found the $(ARCH) or $(MACH))
+endif
+
+
+# System environment variable.
+ifeq ($(OS),Windows_NT)
+	HOSTOS		:= windows
+else
+	ifeq ($(shell uname),Darwin)
+		HOSTOS		:= macos
+	else
+		ifeq ($(shell uname),Linux)
+			HOSTOS		:= linux
+		else
+			HOSTOS		:= unix-like
+		endif
+	endif
+endif
+
+ifeq ($(HOSTOS),windows)
+	SUFFIX	:= .exe
+else
+	SUFFIX	:=
+endif
+# Load default variables.
+CFLAGS		:=
+ASFLAGS		:=
+LDFLAGS		:=
+ARCH_CFLAGS	:=
+MCFLAGS		:=
+MLDFLAGS	:=
+DEFINES		:=
+
+LIBDIRS		:=
+LIBS 		:=
+INCDIRS		:=
+SRCDIRS		:=
+
+# Make variables (CC, etc...)
+AS			:=	$(CROSS_COMPILE)gcc -x assembler-with-cpp
+CC			:=	$(CROSS_COMPILE)gcc
+CPP			:=	$(CROSS_COMPILE)gcc -E
+CXX			:=	$(CROSS_COMPILE)g++
+LD			:=	$(CROSS_COMPILE)ld
+AR			:=	$(CROSS_COMPILE)ar
+OC			:=	$(CROSS_COMPILE)objcopy
+OD			:=	$(CROSS_COMPILE)objdump
+NM			:=	nm
+
+HOSTCC		:=	gcc
+
+# Override default variables.
+sinclude $(srctree)/arch/$(ARCH)/$(MACH)/Makefile.mach
+sinclude $(srctree)/arch/$(ARCH)/Makefile.arch
+
+# We need some generic definitions (do not try to remake the file).
+include $(srctree)/scripts/Makefile.include
+
+# Add necessary directory for INCDIRS and SRCDIRS.
+SRCDIRS		+=	arch/$(ARCH) init mm src fs drivers lib sound
+#ucos2 uCGUI lwip
+	
+INCDIRS		+=	include	drivers					\
+				arch/$(ARCH)/include			\
+				arch/$(ARCH)/$(MACH)/include	\
+				fs/Fatfs_f8a					\
+				external/ucos2/SOURCE			\
+				external/ucos2/PORT				\
+				external/uCGUI/Config			\
+				external/uCGUI/GUI/Core			\
+				external/uCGUI/GUI/WM			\
+				external/uCGUI/GUI/Widget		\
+				external/lwip/include			\
+				external/lwip/include/arch		\
+				external/lwip/include/ipv4		\
+				external/helix/pub
+
+sinclude $(srctree)/arch/$(ARCH)/$(MACH)/Makefile.head
+
+HEAD_FILES	+=	arch/$(ARCH)/$(MACH)/head.S
+HEAD_OBJS	+=	$(patsubst %.S, %.o, $(filter %.S, $(wildcard $(HEAD_FILES))))
+HEAD_OBJS	+=	$(patsubst %.c, %.o, $(filter %.c, $(wildcard $(HEAD_FILES))))
+
+X_ASFLAGS	:=	$(ARCH_CFLAGS) $(MCFLAGS) $(MASFLAGS) $(ASFLAGS)
+X_CFLAGS	:=	$(ARCH_CFLAGS) $(MCFLAGS) $(CFLAGS)
+
+X_LDFLAGS	:=	$(MLDFLAGS) $(LDFLAGS)
+X_LIBS		:=	$(LIBS)
+
+X_NAME		:=	sos
+
+X_INCDIRS	:=	$(patsubst %, -I %, \
+				$(foreach d,$(INCDIRS),$(wildcard $(srctree)/$(d))))
+X_CPPFLAGS	:=	$(DEFINES) $(X_INCDIRS) -include include/config/autoconf.h
+
+X_LIBDIRS	:=	$(LIBDIRS)
+X_LDFLAGS	+=	$(X_LIBDIRS)
+
+X_OBJS		:=	$(patsubst $(srctree)/%, %/built-in.o, \
+				$(foreach d,$(SRCDIRS),$(wildcard $(srctree)/$(d)))) \
+				$(HEAD_OBJS)
+
+export BUILD_OBJ BUILD_SRC HEAD_OBJS HOSTOS
+export ARCH MACH
+export AS AR CC LD CPP CXX
+export X_ASFLAGS X_INCDIRS X_CFLAGS X_CPPFLAGS DEFINES
+
+include $(srctree)/scripts/Makefile.conf
+
+PHONY	+=	all clean xbegin xend xclean conf fixdep dis dnw $(SRCDIRS)
+
+
+# SOS rules
+all: xend
+
+xend : $(X_NAME).bin
+
+$(SRCDIRS):	xbegin
+
+xbegin: scripts/fixdep$(SUFFIX) conf
+
+scripts/fixdep$(SUFFIX): $(srctree)/scripts/fixdep.c
+	@$(MKDIR) scripts
+	@echo [HOSTCC] scripts/fixdep.c
+ifeq ($(strip $(HOSTOS)),windows)
+	@$(HOSTCC) -o $@ $< -lwsock32
+else
+	@$(HOSTCC) -o $@ $<
+endif
+
+$(X_NAME).bin: system_tmp kallsyms.o
+	@echo [LD] system
+	@$(LD) $(X_LDFLAGS) -o system $(X_OBJS) $(X_LIBS) kallsyms.o
+	@echo [OC] $(X_NAME).bin
+	@$(OC) -O binary -S system $@
+
+$(X_OBJS): $(SRCDIRS) ;
+
+$(SRCDIRS):
+	@$(MAKE) $(build)=$@
+
+system_tmp:	$(X_OBJS)
+	@$(LD) $(X_LDFLAGS) -o $@ $^ $(X_LIBS)
+
+kallsyms.o: kallsyms$(SUFFIX) system_tmp
+	@echo [NM] system_tmp | ./kallsyms > kallsyms.S
+	@$(NM) -n system_tmp | ./kallsyms > kallsyms.S
+	@echo [CC] kallsyms.S
+	@$(CC) -c kallsyms.S -o $@
+
+kallsyms$(SUFFIX): $(srctree)/scripts/kallsyms.c
+	@echo [HOSTCC] scripts/kallsyms.c
+	@$(HOSTCC) -o kallsyms $(srctree)/scripts/kallsyms.c
+
+dis: system
+	@echo [OD] $(X_NAME).dis
+	@$(OD) -D -m arm system > $(X_NAME).dis
+
+dnw: $(X_NAME).bin
+	dnw $(X_NAME).bin
 
 clean:
-	rm -f $(shell find -name "*.o")
-	rm -f $(TARGET)
+	@echo [RM] system system_tmp
+	@$(RM) system system_tmp
+	@echo [RM] kallsyms*
+	@$(RM) kallsyms*
+	@echo [RM] fixdep
+	@$(RM) scripts/fixdep$(SUFFIX)
+	@echo [RM] *.[osd]
+	@$(RM) $(shell find -name "*.[osd]")
+	@echo [RM] *.[osSc]~
+	@$(RM) $(shell find -name "*.[osSc]~")
+	@echo [RM] .*.cmd
+	@$(RM) $(shell find -name ".*.cmd")
+	@echo [RM] include/config
+	@$(RM) include/config
+	@echo [RM] $(X_NAME).*
+	@$(RM) $(X_NAME).*
 
-distclean:
-	rm -f $(shell find -name "*.o")
-	rm -f $(shell find -name ".*.d")
-	rm -f $(shell find -name "*.a")
-	rm -f $(shell find -name "*.mac")
-	rm -f $(TARGET) $(TARGET).dis $(TARGET).bin system system_temp kallsyms.S kallsyms.exe
+endif
+
+PHONY += FORCE
+
+FORCE:
+
+# Declare the contents of the .PHONY variable as phony.  We keep that
+# information in a variable so we can use it in if_changed and friends.
+.PHONY: $(PHONY)

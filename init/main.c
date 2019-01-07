@@ -3,8 +3,6 @@
 #include <interrupt.h>
 #include <serial.h>
 #include <assert.h>
-#include <global_config.h>
-#include "command.h"
 
 //lcd driver
 #include "lcddrv.h"
@@ -26,8 +24,8 @@
 FATFS fatworkarea;         // Work area (file system object) for logical drives 
 
 void show_bss_info(){
-	extern char __bss_start, __bss_end;
-    unsigned int size = &__bss_end - &__bss_start;
+	extern char _bss, _ebss;
+    unsigned int size = &_ebss - &_bss;
 	printf("BSS大小为：%uKB, %uMB\n", size/1024, size/1024/1024);
 }
 static void initer(void (*init)(), char *msg){

@@ -1,8 +1,8 @@
 obj-y += LCDDriver/
-libobj-y += ConvertColor/
-libobj-y += ConvertMono/
-libobj-y += Core/
-libobj-y += Widget/
-libobj-y += WM/
-libobj-y += Font/
-libobj-y += AntiAlias/
+obj-y += ConvertColor/
+obj-y += ConvertMono/
+obj-y += Core/
+obj-y += Widget/
+obj-y += WM/
+obj-y += Font/
+obj-y += AntiAlias/

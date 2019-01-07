@@ -38,8 +38,13 @@ int read_symbol(FILE *filp, struct symbol_entry *sym_entry) {
 		}
 		return -1;
 	}
-	if (sym_entry->type != 'T')
-		return -1;
+	if (sym_entry->type == 't'){
+		if(strcmp(string, "$a") == 0)
+			return -1;
+		if(strcmp(string, "$d") == 0)
+			return -1;
+	}
+		
 	sym_entry->symbol = strdup(string);
 	sym_entry->symbol_length = strlen(string) + 1;
 	return 0;
@@ -106,7 +111,7 @@ void write_src(void) {
 		if (table[i].address == last_addr)
 			continue;
 
-		printf("\t.word\t%d\n", position);
+		printf("\t.word\t%ld\n", position);
 		position += table[i].symbol_length;
 		last_addr = table[i].address;
 	}

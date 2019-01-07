@@ -1,5 +1,5 @@
-#include <global_config.h>
 #include <assert.h>
+
 #define MMU_FULL_ACCESS     (3)			/* 访问权限 */
 #define MMU_DOMAIN(x)       (x)			/* 属于哪个域 */
 #define MMU_SPECIAL         (1)			/* 必须是1 */
@@ -93,7 +93,7 @@ typedef struct TINY_PAGE {
 } TINY_PAGE;
 
 void __set_SECTION(unsigned long virtuladdr, unsigned long physicaladdr, unsigned int AP, unsigned int domain, unsigned int C, unsigned int B){
-	volatile SECTION *mmu_tlb_base = (volatile SECTION *)MUM_TLB_BASE_ADDR;
+	volatile SECTION *mmu_tlb_base = (volatile SECTION *)CONFIG_MUM_TLB_BASE_ADDR;
 	SECTION sec = {
 		.base_address = physicaladdr >> MMU_SECTION_SHIFT,
 		.blank0 = 0,
@@ -147,14 +147,14 @@ void create_page_table(void) {
 	 * 将虚拟地址0x48000000～0x5FFFFFFF映射到物理地址0x48000000～0x5FFFFFFF上，
 	 */
 	printf("正在创建特殊寄存器页表项\n");
-	set_SECTION(VIRTUAL_IO_ADDR, VIRTUAL_IO_ADDR, IO_MAP_SIZE >> MMU_SECTION_SHIFT, MMU_FULL_ACCESS, MMU_DOMAIN(0), MMU_CACHE_DISABLE, MMU_BUFFER_DISABLE);
+	set_SECTION(CONFIG_VIRTUAL_IO_ADDR, CONFIG_VIRTUAL_IO_ADDR, CONFIG_IO_MAP_SIZE >> MMU_SECTION_SHIFT, MMU_FULL_ACCESS, MMU_DOMAIN(0), MMU_CACHE_DISABLE, MMU_BUFFER_DISABLE);
 	/*
 	 * SDRAM的物理地址范围是0x30000000～0x33FFFFFF，
 	 * 将虚拟地址0x30000000～0x33FFFFFF映射到物理地址0x30000000～0x33FFFFFF上，
 	 * 总共64M，涉及64个段描述符
 	 */
 	printf("正在创建SDRAM页表项\n");
-	set_SECTION(VIRTUAL_MEM_ADDR, PHYSICAL_MEM_ADDR, MEM_MAP_SIZE >> MMU_SECTION_SHIFT, MMU_FULL_ACCESS, MMU_DOMAIN(0), MMU_CACHE_ENABLE, MMU_BUFFER_ENABLE);
+	set_SECTION(CONFIG_VIRTUAL_MEM_ADDR, CONFIG_PHYSICAL_MEM_ADDR, CONFIG_MEM_MAP_SIZE >> MMU_SECTION_SHIFT, MMU_FULL_ACCESS, MMU_DOMAIN(0), MMU_CACHE_ENABLE, MMU_BUFFER_ENABLE);
 	//关闭framebuffer的cache
 	//set_SECTION(0x33c00000, 0x33c00000, 1, MMU_FULL_ACCESS, MMU_DOMAIN(0), MMU_CACHE_DISABLE, MMU_BUFFER_DISABLE);
 	//设置BANK4
@@ -167,7 +167,7 @@ void create_page_table(void) {
  * 启动MMU
  */
 void mmu_init(void) {
-	unsigned long ttb = (unsigned long)MUM_TLB_BASE_ADDR;;
+	unsigned long ttb = (unsigned long)CONFIG_MUM_TLB_BASE_ADDR;;
 	//创建页表
 	printf("正在创建页表\n");
 	create_page_table();

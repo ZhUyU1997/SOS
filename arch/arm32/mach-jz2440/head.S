@@ -1,4 +1,3 @@
-#include <global_config.h>
 .text
 .global _start 
 _start:
@@ -31,10 +30,10 @@ HandleFIQ:
     ldr pc, = HandleFIQ
 
 Reset:
-#if BOOT_MODE == BOOT_FORM_STEPPINGSTONE
+#if defined(CONFIG_BOOT_FORM_STEPPINGSTONE)
 	msr cpsr_c, #0xd3		@ 进入管理模式设置I-bit=1，关IRQ中断
     ldr sp, =4096           @ 设置管理模式栈指针
-#elif BOOT_MODE == BOOT_FORM_SDRAM
+#elif defined(CONFIG_BOOT_FORM_SDRAM)
 	msr cpsr_c, #0xd3		@ 进入管理模式设置I-bit=1，关IRQ中断
     ldr sp, =0x33f00000     @ 设置管理模式栈指针
 #else
@@ -44,31 +43,31 @@ Reset:
 	bl clock_init			@ 2. 设置时钟
 	bl memsetup				@ 3. 初始化SDRAM
 
-#if BOOT_MODE == BOOT_FORM_STEPPINGSTONE
+#if defined(CONFIG_FORM_STEPPINGSTONE)
 	bl nand_init_ll
 
 	@复制代码到SDRAM中					
     ldr r0, =_start			@ 1. 目标地址
     mov r1, #0				@ 2. 源地址  运行地址在SDRAM中的代码保存在NAND Flash 0地址开始处
-	ldr r2, =__bss_start
+	ldr r2, =_bss
 	sub r2, r2, r0			@ 3. 复制长度 = __bss_start - _start
     bl  copy_code_to_sdram  @ 调用C函数copy_code_to_SDRAM
 #endif
     bl  clean_bss           @ 清除bss段，未初始化或初值为0的全局/静态变量保存在bss段
     msr cpsr_c, #0xd2       @ 进入中断模式
-    ldr sp, =0x33d80000     @ 设置中断模式栈指针
+    ldr sp, =CONFIG_IRQ_STACK_BASE_ADDR     @ 设置中断模式栈指针
 
     msr cpsr_c, #0xdf       @ 进入系统模式
-    ldr sp, =0x33e00000     @ 设置系统模式栈指针
+    ldr sp, =CONFIG_SYS_STACK_BASE_ADDR     @ 设置系统模式栈指针
 
 	msr cpsr_c, #0xd7       @ 进入数据访问终止模式
-    ldr sp, =0x33e80000     @ 设置数据访问终止模式栈指针
+    ldr sp, =CONFIG_ABT_STACK_BASE_ADDR     @ 设置数据访问终止模式栈指针
 
 	msr cpsr_c, #0xdb       @ 进入未定义指令中止模式
-    ldr sp, =0x33e80000     @ 设置未定义指令中止模式栈指针
+    ldr sp, =CONFIG_UND_STACK_BASE_ADDR     @ 设置未定义指令中止模式栈指针
 
 	msr cpsr_c, #0xd3		@ 进入管理模式设置I-bit=1，关IRQ中断
-    ldr sp, =0x33f00000     @ 设置管理模式栈指针
+    ldr sp, =CONFIG_SWI_STACK_BASE_ADDR     @ 设置管理模式栈指针
 	ldr fp, =0x33f00000     @ 设置栈帧指针
 
 	@跳转地址过大不能用bl指令

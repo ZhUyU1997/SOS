@@ -12,7 +12,7 @@
 *
 *
 ***************************************************/
-#include <global_config.h>
+
 #include "backtrace.h"
 
 extern unsigned long kallsyms_addresses[] __attribute__((weak));;
@@ -41,7 +41,7 @@ void backtrace(unsigned long regs) {
 	unsigned long ret_address;
 
 	for (int i = 0; i < 10; i++) {
-		if (rbp >= SWI_STACK_BASE_ADDR) {
+		if (rbp >= CONFIG_SWI_STACK_BASE_ADDR) {
 			printf("\033[31;40m到达栈顶\033[0m\n");
 			break;
 		}
