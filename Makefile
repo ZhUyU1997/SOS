@@ -131,7 +131,7 @@ sinclude $(srctree)/arch/$(ARCH)/Makefile.arch
 include $(srctree)/scripts/Makefile.include
 
 # Add necessary directory for INCDIRS and SRCDIRS.
-SRCDIRS		+=	arch/$(ARCH) init mm src fs drivers lib sound
+SRCDIRS		+=	arch/$(ARCH) init mm src fs drivers lib sound external
 #ucos2 uCGUI lwip
 	
 INCDIRS		+=	include	drivers					\
